@@ -1,19 +1,29 @@
 import { Module } from '@nestjs/common';
 import { TodoService } from './todo/todo.service';
-import { AuthController } from "./auth/auth.controller";
-import { TodoController } from "./todo/todo.controller";
-import { ConfigModule, ConfigService } from "@nestjs/config"
+import { AuthResolver } from "./auth/auth.resolver";
+import { TodoResolver } from "./todo/todo.resolver";
+import { ConfigModule } from "@nestjs/config"
+import { GraphQLModule } from "@nestjs/graphql";
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      playground: true,
+      typePaths: ["./**/*.graphql"],
     })
   ],
-  controllers: [
-    AuthController,
-    TodoController
+  providers: [
+    //services
+    TodoService,
+
+    //resolvers
+    AuthResolver,
+    TodoResolver
   ],
-  providers: [TodoService],
 })
 export class AppModule { }
