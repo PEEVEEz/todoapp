@@ -1,29 +1,27 @@
 import { Module } from '@nestjs/common';
-import { TodoService } from './todo/todo.service';
-import { AuthResolver } from "./auth/auth.resolver";
-import { TodoResolver } from "./todo/todo.resolver";
 import { ConfigModule } from "@nestjs/config"
-import { GraphQLModule } from "@nestjs/graphql";
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { UserSchema } from './user/user.schema';
+import { TodoService } from './todo/todo.service';
+import { MongooseModule } from "@nestjs/mongoose";
+import { AuthService } from "./auth/auth.service";
+import { AuthController } from "./auth/auth.controller";
+import { TodoController } from "./todo/todo.controller";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true
-    }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      playground: true,
-      typePaths: ["./**/*.graphql"],
-    })
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(process.env.MONGO_URL),
+    MongooseModule.forFeature([
+      { name: "users", schema: UserSchema }
+    ])
+  ],
+  controllers: [
+    AuthController,
+    TodoController
   ],
   providers: [
-    //services
     TodoService,
-
-    //resolvers
-    AuthResolver,
-    TodoResolver
+    AuthService
   ],
 })
 export class AppModule { }
